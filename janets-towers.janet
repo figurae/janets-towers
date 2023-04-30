@@ -83,8 +83,8 @@
 
 # initial values live here
 
-(def FRCTN 0.1)
 # constants
+(def FRCTN 0.3)
 (def GRVTY 0.5)
 
 # buttons
