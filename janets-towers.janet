@@ -86,10 +86,10 @@
 (def FRCTN 0.1)
 (def GRVTY 0.5)
 
-(def up 0)
-(def dn 1)
-(def lt 2)
-(def rt 3)
+(def UP 0)
+(def DN 1)
+(def LT 2)
+(def RT 3)
 
 (def ent @{:pos (newvec)
            :vel (newvec)
@@ -110,10 +110,10 @@
 # main loop goes here
 
 (defn TIC []
-  (when (btn up) (:up (plr :vel)))
-  (when (btn dn) (:dn (plr :vel)))
-  (when (btn lt) (:lt (plr :vel)))
-  (when (btn rt) (:rt (plr :vel)))
+  (when (btn UP) (:up (plr :vel)))
+  (when (btn DN) (:dn (plr :vel)))
+  (when (btn LT) (:lt (plr :vel)))
+  (when (btn RT) (:rt (plr :vel)))
   (cls 0)
   (:updt plr)
   (:draw plr))
@@ -154,3 +154,4 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
+
