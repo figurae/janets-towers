@@ -84,13 +84,16 @@
 # initial values live here
 
 (def FRCTN 0.1)
+# constants
 (def GRVTY 0.5)
 
+# buttons
 (def UP 0)
 (def DN 1)
 (def LT 2)
 (def RT 3)
 
+# entity
 (def ent @{:pos (newvec)
            :vel (newvec)
            :dead false
@@ -105,6 +108,7 @@
            :draw (fn [self]
                    (sprv (self :spr) (self :pos)))})
 
+# player
 (def plr (table/setproto @{:spr 256} ent))
 
 # main loop goes here
