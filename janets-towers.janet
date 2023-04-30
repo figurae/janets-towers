@@ -9,11 +9,9 @@
 
 (use tic80) # module shmodule :3
 
-#
 # a lil vector type with helpers,
 # mostly stolen from
 # https://github.com/AlecTroemel/junk-drawer
-#
 
 # pass the operator to both vector
 # components and return mutated lhs
@@ -83,9 +81,7 @@
   (default scale 2)
   (spr id (math/round (pos-vec :x)) (math/round (pos-vec :y)) 0 scale))
 
-#
 # initial values live here
-#
 
 (def FRCTN 0.1)
 (def GRVTY 0.5)
@@ -111,9 +107,7 @@
 
 (def plr (table/setproto @{:spr 256} ent))
 
-#
 # main loop goes here
-#
 
 (defn TIC []
   (when (btn up) (:up (plr :vel)))
@@ -160,4 +154,3 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
-
