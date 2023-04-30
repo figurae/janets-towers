@@ -65,16 +65,16 @@
       (and (= (self :x) 0) (= (self :y) 0)))
     :issmol
     (fn [self]
-      (or (< (self :x) 1) (< (self :y) 1)))})
+      (or (< (self :x) 1) (< (self :y) 1)))
+    :zerosmol
+    (fn [self]
+      (when (< (math/abs (self :x)) 1) (set (self :x) 0))
+      (when (< (math/abs (self :y)) 1) (set (self :y) 0)))})
 
 (defn newvec [&opt x y]
   (default x 0)
   (default y 0)
   (table/setproto @{:x x :y y} vec))
-
-(defn zerosmol [vec]
-  (when (< (math/abs (vec :x)) 1) (set (vec :x) 0))
-  (when (< (math/abs (vec :y)) 1) (set (vec :y) 0)))
 
 (defn sprv [id &opt pos-vec scale]
   (default pos-vec {:x 0 :y 0})
@@ -154,4 +154,3 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
-
