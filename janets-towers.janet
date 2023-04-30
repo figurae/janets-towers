@@ -100,10 +100,10 @@
            # TODO: handle dt
            :updt (fn [self]
                    (do
-                     (if (:issmol (self :vel))
-                       (zerosmol (self :vel))
-                       # TODO: maybe add/sub instead
-                       (:div (self :vel) (+ 1 FRCTN)))
+                     (:zerosmol (self :vel))
+                     (when (not (:iszero (self :vel))))
+                       # TODO: add/sub should be more performant
+                       (:div (self :vel) (+ 1 FRCTN))
                      (:add (self :pos) (self :vel))))
            :draw (fn [self]
                    (sprv (self :spr) (self :pos)))})
