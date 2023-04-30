@@ -15,78 +15,74 @@
 # https://github.com/AlecTroemel/junk-drawer
 #
 
-# pass the operator to both vector 
+# pass the operator to both vector
 # components and return mutated lhs
 (defn pass-operator [op a b]
   # handle vector-vector and vector-scalar operations
-		(let [b (cond (number? b) {:x b :y b} b)]
-		  (put a :x (op (a :x) (b :x)))
-				(put a :y (op (a :y) (b :y)))
-				a))
+  (let [b (cond (number? b) {:x b :y b} b)]
+    (put a :x (op (a :x) (b :x)))
+    (put a :y (op (a :y) (b :y)))
+    a))
 
 (def vec
   @{:add
-      (fn [self other]
+    (fn [self other]
       (pass-operator + self other))
     :sub
-      (fn [self other]
+    (fn [self other]
       (pass-operator - self other))
     :mul
-      (fn [self other]
+    (fn [self other]
       (pass-operator * self other))
     :div
-      (fn [self other]
+    (fn [self other]
       (pass-operator / self other))
     :dst2
-      (fn [self other]
+    (fn [self other]
       (let [dx (- (self :x) (other :x))
             dy (- (self :y) (other :y))]
-								(+ (* dx dx)
-								   (* dy dy))))
-				:dst
-				  (fn [self other]
-						(math/sqrt (:dist2 self other)))
-				:lt
-				  (fn [self]
-						(:sub self {:x 1 :y 0}))
-				:rt
-				  (fn [self]
-						(:add self {:x 1 :y 0}))
-				:up
-				  (fn [self]
-						(:sub self {:x 0 :y 1}))
-				:dn
-				  (fn [self]
-						(:add self {:x 0 :y 1}))
-				:toint
-				  (fn [self]
-						(table/setproto @{
-								:x (math/round (self :x))
-								:y (math/round (self :y))
-						} (table/getproto self)
-						))
-				:iszero
-				  (fn [self]
-						(and (= (self :x) 0) (= (self :y) 0)))
-				:issmol
-				  (fn [self]
-						(or (< (self :x) 1) (< (self :y) 1)))
-				})
+        (+ (* dx dx)
+           (* dy dy))))
+    :dst
+    (fn [self other]
+      (math/sqrt (:dist2 self other)))
+    :lt
+    (fn [self]
+      (:sub self {:x 1 :y 0}))
+    :rt
+    (fn [self]
+      (:add self {:x 1 :y 0}))
+    :up
+    (fn [self]
+      (:sub self {:x 0 :y 1}))
+    :dn
+    (fn [self]
+      (:add self {:x 0 :y 1}))
+    :toint
+    (fn [self]
+      (table/setproto @{:x (math/round (self :x))
+                        :y (math/round (self :y))} (table/getproto self)))
+    :iszero
+    (fn [self]
+      (and (= (self :x) 0) (= (self :y) 0)))
+    :issmol
+    (fn [self]
+      (or (< (self :x) 1) (< (self :y) 1)))})
 
 (defn newvec [&opt x y]
   (default x 0)
   (default y 0)
   (table/setproto @{:x x :y y} vec))
-  
+
 (defn zerosmol [vec]
   (when (< (math/abs (vec :x)) 1) (set (vec :x) 0))
   (when (< (math/abs (vec :y)) 1) (set (vec :y) 0)))
-  
+
 (defn sprv [id &opt pos-vec scale]
   (default pos-vec {:x 0 :y 0})
   (default scale 2)
   (spr id (math/round (pos-vec :x)) (math/round (pos-vec :y)) 0 scale))
-  
+
 #
 # initial values live here
 #
@@ -99,25 +95,21 @@
 (def lt 2)
 (def rt 3)
 
-(def ent @{
-  :pos  (newvec)
-  :vel  (newvec)
-  :dead false
-  # TODO: handle dt
-  :updt (fn [self]
-          (do
-            (if (:issmol (self :vel))
-              (zerosmol (self :vel))
-              # TODO: maybe add/sub instead
-              (:div (self :vel) (+ 1 FRCTN)))
-            (:add (self :pos) (self :vel))))
-  :draw (fn [self]
-          (sprv (self :spr) (self :pos)))
-})
+(def ent @{:pos (newvec)
+           :vel (newvec)
+           :dead false
+           # TODO: handle dt
+           :updt (fn [self]
+                   (do
+                     (if (:issmol (self :vel))
+                       (zerosmol (self :vel))
+                       # TODO: maybe add/sub instead
+                       (:div (self :vel) (+ 1 FRCTN)))
+                     (:add (self :pos) (self :vel))))
+           :draw (fn [self]
+                   (sprv (self :spr) (self :pos)))})
 
-(def plr (table/setproto @{
-  :spr 256
-} ent))
+(def plr (table/setproto @{:spr 256} ent))
 
 #
 # main loop goes here
@@ -130,8 +122,7 @@
   (when (btn rt) (:rt (plr :vel)))
   (cls 0)
   (:updt plr)
-  (:draw plr)
-)
+  (:draw plr))
 
 # <TILES>
 # 001:eccccccccc888888caaaaaaaca888888cacccccccacc0ccccacc0ccccacc0ccc
