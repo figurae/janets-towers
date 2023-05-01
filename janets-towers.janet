@@ -79,8 +79,8 @@
       (set (self component) (- (self component) (* value (signum (self component))))))
     :clamp
     (fn [self component value]
-      (def posval (math/abs value))
-      (set (self component) (clamp (self component) (* posval -1) posval)))
+      (def positive-value (math/abs value))
+      (set (self component) (clamp (self component) (* positive-value -1) positive-value)))
     :apply
     (fn [self component value &opt modifier]
       (default modifier 1)
