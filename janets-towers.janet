@@ -7,26 +7,28 @@
 # script:  janet
 # strict:  true
 
-(use tic80) # module shmodule :3
+# this pollutes the namespace, but it's
+# much more straightforward than importing
+(use tic80)
 
 # initial values live here
 
 # constants
 
 # general
-(def SMOL 0.1) # a small number that is close enough to 0
+(def smol-number 0.1) # a small number that is close enough to 0
 
 # physics
-(def FRCTN 0.1)
-(def GRVTY 0.5)
-(def MXSPD 2)
+(def friction 0.1)
+(def gravity 0.5)
+(def max-speed 2)
 
 # buttons
-(def UP 0)
-(def DN 1)
-(def LT 2)
-(def RT 3)
-(def A 4)
+(def up 0)
+(def down 1)
+(def left 2)
+(def right 3)
+(def a 4)
 
 # a lil vector type with helpers,
 # mostly stolen from
@@ -44,113 +46,95 @@
 (defn clamp [x a b]
   (if (< x a) a (if (> x b) b x)))
 
-(defn sign [x]
+(defn signum [x]
   (if (< x 0) -1 (if (> x 0) 1 0)))
 
-(def vec
+(def vector
   @{:add
     (fn [self other]
       (pass-operator + self other))
-    :sub
+    :subtract
     (fn [self other]
       (pass-operator - self other))
-    :mul
+    :multiply
     (fn [self other]
       (pass-operator * self other))
-    :div
+    :divide
     (fn [self other]
       (pass-operator / self other))
-    :dst2
+    :distance-squared
     (fn [self other]
       (let [dx (- (self :x) (other :x))
             dy (- (self :y) (other :y))]
         (+ (* dx dx)
            (* dy dy))))
-    :dst
+    :distance
     (fn [self other]
-      (math/sqrt (:dist2 self other)))
-    :lt # TODO: refactor
-    (fn [self]
-      (:sub self {:x 1 :y 0}))
-    :rt
-    (fn [self]
-      (:add self {:x 1 :y 0}))
-    :up
-    (fn [self]
-      (:sub self {:x 0 :y 1}))
-    :dn
-    (fn [self]
-      (:add self {:x 0 :y 1}))
-    :toint
-    (fn [self]
-      (table/setproto @{:x (math/round (self :x))
-                        :y (math/round (self :y))} (table/getproto self))) # TODO: is this used?
-    :iszero
-    (fn [self]
-      (and (= (self :x) 0) (= (self :y) 0))) # TODO: is this used?
-    :issmol
-    (fn [self cmpt smol]
-      (or (< (self cmpt) smol) (< (self cmpt) smol))) # TODO: is this used?
-    :zerosmol
-    (fn [self cmpt smol]
-      (when (< (math/abs (self cmpt)) smol) (set (self cmpt) 0)))
-    :reduceby
-    (fn [self cmpt value]
-      (set (self cmpt) (- (self cmpt) (* value (sign (self cmpt))))))
+      (math/sqrt (:distance-squared self other)))
+    :zero-if-smol
+    (fn [self component smol]
+      (when (< (math/abs (self component)) smol) (set (self component) 0)))
+    :reduce-by
+    (fn [self component value]
+      (set (self component) (- (self component) (* value (signum (self component))))))
     :clamp
-    (fn [self cmpt value]
+    (fn [self component value]
       (def posval (math/abs value))
-      (set (self cmpt) (clamp (self cmpt) (* posval -1) posval)))
+      (set (self component) (clamp (self component) (* posval -1) posval)))
     :apply
-    (fn [self cmpt value &opt modifier]
+    (fn [self component value &opt modifier]
       (default modifier 1)
-      (+= (self cmpt) (* value modifier)))})
+      (+= (self component) (* value modifier)))})
 
-(defn newvec [&opt x y]
+(defn new-vector [&opt x y]
   (default x 0)
   (default y 0)
-  (table/setproto @{:x x :y y} vec))
+  (table/setproto @{:x x :y y} vector))
 
-(defn sprv [id &opt pos-vec scale]
-  (default pos-vec {:x 0 :y 0})
+(defn draw-sprite-vector [sprite-id &opt position-vector scale]
+  (default position-vector {:x 0 :y 0})
   (default scale 2)
-  (spr id (math/round (pos-vec :x)) (math/round (pos-vec :y)) 0 scale))
+  (spr sprite-id (math/round (position-vector :x)) (math/round (position-vector :y)) 0 scale))
 
 # game objects live here
 
-(def ent @{:pos (newvec)
-           :vel (newvec)
-           :dead false
-           :grnd false
-           :updt (fn [self dt]
-                   (do
-                     (when (not (self :grnd))
-                       (:apply (self :vel) :y GRVTY dt))
-                     (:zerosmol (self :vel) :x SMOL)
-                     (when (not (:iszero (self :vel)))
-                       (:reduceby (self :vel) :x FRCTN)
-                       (:add (self :pos) (self :vel)))
-                     (:clamp (self :vel) :x MXSPD)))
-           :draw (fn [self]
-                   (sprv (self :spr) (self :pos)))})
+(def entity @{:position (new-vector)
+              :velocity (new-vector)
               :acceleration 0
+              :max-velocity 0
+              :is-dead false
+              :is-on-ground false
+              :update (fn [self dt]
+                        (do
+                          (when (not (self :is-on-ground))
+                            (:apply (self :velocity) :y gravity dt))
+
+                          (:zero-if-smol (self :velocity) :x smol-number)
+
+                          (when (not (= ((self :velocity) :x) 0))
+                            (:reduce-by (self :velocity) :x friction))
+
                           (:apply (self :velocity) :x (self :acceleration) dt)
+                          (:add (self :position) (self :velocity))
+                          (:clamp (self :velocity) :x (self :max-velocity))))
+              :draw (fn [self]
+                      (draw-sprite-vector (self :sprite-id) (self :position)))})
 
 # player
-(def plr (table/setproto @{:spr 256 :spd 10} ent))
+(def player (table/setproto @{:sprite-id 256 :max-velocity 2} entity))
 
-(defn ctrl []
+(defn handle-input []
   # TODO: make this more abstract to handle menus
   (when (btn left) (set (player :acceleration) -1))
   (when (btn right) (set (player :acceleration) 1)))
 
-(defn updt [dt]
-  (set (plr :grnd) true) # TODO: remove
-  (:updt plr dt))
+(defn update [dt]
+  (set (player :is-on-ground) true) # TODO: remove later
+  (:update player dt))
 
 (defn draw []
   (cls)
-  (:draw plr))
+  (:draw player))
 
 (var dt 0)
 (var pt (time))
@@ -162,8 +146,8 @@
   (set dt (/ (- now pt) 100.0))
   (set pt now)
 
-  (ctrl)
-  (updt dt)
+  (handle-input)
+  (update dt)
   (draw))
 
 # <TILES>
@@ -202,3 +186,4 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
+
