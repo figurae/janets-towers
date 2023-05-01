@@ -96,7 +96,17 @@
   (default scale 2)
   (spr sprite-id (math/round (position-vector :x)) (math/round (position-vector :y)) 0 scale))
 
-# game objects live here
+# game handling begins here
+
+(def input @{:left false
+             :right false
+             :up false
+             :down false
+             :a false
+             :is-left-or-right (fn [self]
+                                 (if (or
+                                       (self :left)
+                                       (self :right)) true false))})
 
 (def entity @{:position (new-vector)
               :velocity (new-vector)
@@ -121,15 +131,30 @@
                       (draw-sprite-vector (self :sprite-id) (self :position)))})
 
 # player
-(def player (table/setproto @{:sprite-id 256 :max-velocity 2} entity))
-
+(def player
+  (table/setproto @{:sprite-id 256
+                    :max-velocity 2
+                    :is-controllable false
+                    :handle-input (fn [self]
+                                    (when (self :is-controllable)
+                                      (if (:is-left-or-right input)
+                                        (do
+                                          (when (input :left)
+                                            (set (self :acceleration) -1))
+                                          (when (input :right)
+                                            (set (self :acceleration) 1)))
+                                        (set (self :acceleration) 0))))} entity))
 (defn handle-input []
-  # TODO: make this more abstract to handle menus
-  (when (btn left) (set (player :acceleration) -1))
-  (when (btn right) (set (player :acceleration) 1)))
+  # TODO: this seems redundant
+  (if (btn left) (set (input :left) true) (set (input :left) false))
+  (if (btn right) (set (input :right) true) (set (input :right) false))
+
+  (set (player :is-controllable) true)
+  (:handle-input player))
 
 (defn update [dt]
-  (set (player :is-on-ground) true) # TODO: remove later
+  (set (player :is-on-ground) true)
+
   (:update player dt))
 
 (defn draw []
