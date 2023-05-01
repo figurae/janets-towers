@@ -88,11 +88,11 @@
       (and (= (self :x) 0) (= (self :y) 0)))
     :issmol
     (fn [self]
-      (or (< (self :x) 1) (< (self :y) 1)))
+      (or (< (self :x) SMOL) (< (self :y) SMOL)))
     :zerosmol
     (fn [self]
-      (when (< (math/abs (self :x)) 1) (set (self :x) 0))
-      (when (< (math/abs (self :y)) 1) (set (self :y) 0)))})
+      (when (< (math/abs (self :x)) SMOL) (set (self :x) 0))
+      (when (< (math/abs (self :y)) SMOL) (set (self :y) 0)))
 
 (defn newvec [&opt x y]
   (default x 0)
