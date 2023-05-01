@@ -36,8 +36,8 @@
 (defn pass-operator [op a b]
   # handle vector-vector and vector-scalar operations
   (let [b (cond (number? b) {:x b :y b} b)]
-    (put a :x (op (a :x) (b :x)))
-    (put a :y (op (a :y) (b :y)))
+    (set (a :x) (op (a :x) (b :x)))
+    (set (a :y) (op (a :y) (b :y)))
     a))
 
 (def vec
