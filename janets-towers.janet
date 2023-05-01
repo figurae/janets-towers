@@ -102,10 +102,10 @@
            :updt (fn [self]
                    (do
                      (:zerosmol (self :vel))
-                     (when (not (:iszero (self :vel))))
+                     (when (not (:iszero (self :vel)))
                        # TODO: add/sub should be more performant
                        (:div (self :vel) (+ 1 FRCTN))
-                     (:add (self :pos) (self :vel))))
+                       (:add (self :pos) (self :vel)))))
            :draw (fn [self]
                    (sprv (self :spr) (self :pos)))})
 
