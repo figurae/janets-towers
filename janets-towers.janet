@@ -133,13 +133,16 @@
                      (:clamp (self :vel) :x MXSPD)))
            :draw (fn [self]
                    (sprv (self :spr) (self :pos)))})
+              :acceleration 0
+                          (:apply (self :velocity) :x (self :acceleration) dt)
 
 # player
 (def plr (table/setproto @{:spr 256 :spd 10} ent))
 
 (defn ctrl []
-  (when (btn LT) (:lt (plr :vel)))
-  (when (btn RT) (:rt (plr :vel))))
+  # TODO: make this more abstract to handle menus
+  (when (btn left) (set (player :acceleration) -1))
+  (when (btn right) (set (player :acceleration) 1)))
 
 (defn updt [dt]
   (set (plr :grnd) true) # TODO: remove
@@ -199,4 +202,3 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
-
