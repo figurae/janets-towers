@@ -121,7 +121,7 @@
            :dead false
            :grnd false
            # TODO: handle dt
-           :updt (fn [self]
+           :updt (fn [self dt]
                    (do
                      (:zerosmol (self :vel))
                      (when (not (:iszero (self :vel)))
