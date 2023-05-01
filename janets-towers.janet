@@ -111,18 +111,31 @@
 
 # player
 (def plr (table/setproto @{:spr 256} ent))
+(defn ctrl []
+  (when (btn LT) (:lt (plr :vel)))
+  (when (btn RT) (:rt (plr :vel))))
 
+(defn updt [dt]
+  (:updt plr dt))
+
+(defn draw []
+  (cls)
+  (:draw plr))
+
+(var dt 0)
+(var pt (time))
 # main loop goes here
 
 (defn TIC []
-  (when (btn UP) (:up (plr :vel)))
-  (when (btn DN) (:dn (plr :vel)))
-  (when (btn LT) (:lt (plr :vel)))
-  (when (btn RT) (:rt (plr :vel)))
-  (cls 0)
-  (:updt plr)
-  (:draw plr))
+  (def now (time))
+  (set dt (- now pt))
+  (set pt now)
 
+  (prin dt "\n")
+
+  (ctrl)
+  (updt dt)
+  (draw))
 # <TILES>
 # 001:eccccccccc888888caaaaaaaca888888cacccccccacc0ccccacc0ccccacc0ccc
 # 002:ccccceee8888cceeaaaa0cee888a0ceeccca0ccc0cca0c0c0cca0c0c0cca0c0c
@@ -159,4 +172,3 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
-
