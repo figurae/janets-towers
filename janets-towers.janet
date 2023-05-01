@@ -123,6 +123,7 @@
            # TODO: handle dt
            :updt (fn [self dt]
                    (do
+                     (:clamp (self :vel) :x MXSPD)
                      (:zerosmol (self :vel))
                      (when (not (:iszero (self :vel)))
                        # TODO: add/sub should be more performant
