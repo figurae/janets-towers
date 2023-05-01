@@ -27,6 +27,7 @@
 (def LT 2)
 (def RT 3)
 (def A  4)
+
 # a lil vector type with helpers,
 # mostly stolen from
 # https://github.com/AlecTroemel/junk-drawer
@@ -45,6 +46,7 @@
 
 (defn sign [x]
   (if (< x 0) -1 (if (> x 0) 1 0)))
+
 (def vec
   @{:add
     (fn [self other]
@@ -132,8 +134,8 @@
                    (sprv (self :spr) (self :pos)))})
 
 # player
-(def plr (table/setproto @{:spr 256} ent))
 (def plr (table/setproto @{:spr 256 :spd 10} ent))
+
 (defn ctrl []
   (when (btn LT) (:lt (plr :vel)))
   (when (btn RT) (:rt (plr :vel))))
@@ -147,6 +149,7 @@
 
 (var dt 0)
 (var pt (time))
+
 # main loop goes here
 
 (defn TIC []
@@ -159,6 +162,7 @@
   (ctrl)
   (updt dt)
   (draw))
+
 # <TILES>
 # 001:eccccccccc888888caaaaaaaca888888cacccccccacc0ccccacc0ccccacc0ccc
 # 002:ccccceee8888cceeaaaa0cee888a0ceeccca0ccc0cca0c0c0cca0c0c0cca0c0c
@@ -195,3 +199,4 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
+
