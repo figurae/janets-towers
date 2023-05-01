@@ -112,20 +112,10 @@
   (default scale 2)
   (spr id (math/round (pos-vec :x)) (math/round (pos-vec :y)) 0 scale))
 
-# initial values live here
+# physics helpers
 
-# constants
-(def FRCTN 0.3)
-(def GRVTY 0.5)
+# game objects live here
 
-# buttons
-(def UP 0)
-(def DN 1)
-(def LT 2)
-(def RT 3)
-(def A  4)
-
-# entity
 (def ent @{:pos (newvec)
            :vel (newvec)
            :dead false
