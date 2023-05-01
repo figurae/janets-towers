@@ -111,6 +111,7 @@
 
 # player
 (def plr (table/setproto @{:spr 256} ent))
+(def plr (table/setproto @{:spr 256 :spd 10} ent))
 (defn ctrl []
   (when (btn LT) (:lt (plr :vel)))
   (when (btn RT) (:rt (plr :vel))))
