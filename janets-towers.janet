@@ -157,8 +157,6 @@
   (set dt (- now pt))
   (set pt now)
 
-  (prin dt "\n")
-
   (ctrl)
   (updt dt)
   (draw))
