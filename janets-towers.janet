@@ -93,6 +93,14 @@
     (fn [self]
       (when (< (math/abs (self :x)) SMOL) (set (self :x) 0))
       (when (< (math/abs (self :y)) SMOL) (set (self :y) 0)))
+    :reduceby
+    (fn [self value]
+      (set (self :x) (- (self :x) (* value (sign (self :x)))))
+      (set (self :y) (- (self :y) (* value (sign (self :y))))))
+    :clamp
+    (fn [self cmpt value]
+      (def posval (math/abs value))
+      (set (self cmpt) (clamp (self cmpt) (* posval -1) posval)))})
 
 (defn newvec [&opt x y]
   (default x 0)
