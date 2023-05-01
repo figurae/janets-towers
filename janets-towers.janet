@@ -119,6 +119,7 @@
 (def ent @{:pos (newvec)
            :vel (newvec)
            :dead false
+           :grnd false
            # TODO: handle dt
            :updt (fn [self]
                    (do
