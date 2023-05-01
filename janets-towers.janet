@@ -26,7 +26,7 @@
 (def DN 1)
 (def LT 2)
 (def RT 3)
-(def A  4)
+(def A 4)
 
 # a lil vector type with helpers,
 # mostly stolen from
@@ -69,7 +69,7 @@
     :dst
     (fn [self other]
       (math/sqrt (:dist2 self other)))
-    :lt
+    :lt # TODO: refactor
     (fn [self]
       (:sub self {:x 1 :y 0}))
     :rt
@@ -84,25 +84,27 @@
     :toint
     (fn [self]
       (table/setproto @{:x (math/round (self :x))
-                        :y (math/round (self :y))} (table/getproto self)))
+                        :y (math/round (self :y))} (table/getproto self))) # TODO: is this used?
     :iszero
     (fn [self]
-      (and (= (self :x) 0) (= (self :y) 0)))
+      (and (= (self :x) 0) (= (self :y) 0))) # TODO: is this used?
     :issmol
-    (fn [self]
-      (or (< (self :x) SMOL) (< (self :y) SMOL)))
+    (fn [self cmpt smol]
+      (or (< (self cmpt) smol) (< (self cmpt) smol))) # TODO: is this used?
     :zerosmol
-    (fn [self]
-      (when (< (math/abs (self :x)) SMOL) (set (self :x) 0))
-      (when (< (math/abs (self :y)) SMOL) (set (self :y) 0)))
+    (fn [self cmpt smol]
+      (when (< (math/abs (self cmpt)) smol) (set (self cmpt) 0)))
     :reduceby
-    (fn [self value]
-      (set (self :x) (- (self :x) (* value (sign (self :x)))))
-      (set (self :y) (- (self :y) (* value (sign (self :y))))))
+    (fn [self cmpt value]
+      (set (self cmpt) (- (self cmpt) (* value (sign (self cmpt))))))
     :clamp
     (fn [self cmpt value]
       (def posval (math/abs value))
-      (set (self cmpt) (clamp (self cmpt) (* posval -1) posval)))})
+      (set (self cmpt) (clamp (self cmpt) (* posval -1) posval)))
+    :apply
+    (fn [self cmpt value &opt modifier]
+      (default modifier 1)
+      (+= (self cmpt) (* value modifier)))})
 
 (defn newvec [&opt x y]
   (default x 0)
@@ -114,22 +116,21 @@
   (default scale 2)
   (spr id (math/round (pos-vec :x)) (math/round (pos-vec :y)) 0 scale))
 
-# physics helpers
-
 # game objects live here
 
 (def ent @{:pos (newvec)
            :vel (newvec)
            :dead false
            :grnd false
-           # TODO: handle dt
            :updt (fn [self dt]
                    (do
-                     (:clamp (self :vel) :x MXSPD)
-                     (:zerosmol (self :vel))
+                     (when (not (self :grnd))
+                       (:apply (self :vel) :y GRVTY dt))
+                     (:zerosmol (self :vel) :x SMOL)
                      (when (not (:iszero (self :vel)))
-                       (:reduceby (self :vel) FRCTN)
-                       (:add (self :pos) (self :vel)))))
+                       (:reduceby (self :vel) :x FRCTN)
+                       (:add (self :pos) (self :vel)))
+                     (:clamp (self :vel) :x MXSPD)))
            :draw (fn [self]
                    (sprv (self :spr) (self :pos)))})
 
@@ -141,6 +142,7 @@
   (when (btn RT) (:rt (plr :vel))))
 
 (defn updt [dt]
+  (set (plr :grnd) true) # TODO: remove
   (:updt plr dt))
 
 (defn draw []
@@ -154,7 +156,7 @@
 
 (defn TIC []
   (def now (time))
-  (set dt (- now pt))
+  (set dt (/ (- now pt) 100.0))
   (set pt now)
 
   (ctrl)
