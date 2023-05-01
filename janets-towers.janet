@@ -40,6 +40,11 @@
     (set (a :y) (op (a :y) (b :y)))
     a))
 
+(defn clamp [x a b]
+  (if (< x a) a (if (> x b) b x)))
+
+(defn sign [x]
+  (if (< x 0) -1 (if (> x 0) 1 0)))
 (def vec
   @{:add
     (fn [self other]
