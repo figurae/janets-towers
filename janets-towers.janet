@@ -9,6 +9,24 @@
 
 (use tic80) # module shmodule :3
 
+# initial values live here
+
+# constants
+
+# general
+(def SMOL 0.1) # a small number that is close enough to 0
+
+# physics
+(def FRCTN 0.1)
+(def GRVTY 0.5)
+(def MXSPD 2)
+
+# buttons
+(def UP 0)
+(def DN 1)
+(def LT 2)
+(def RT 3)
+(def A  4)
 # a lil vector type with helpers,
 # mostly stolen from
 # https://github.com/AlecTroemel/junk-drawer
