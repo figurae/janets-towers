@@ -28,6 +28,10 @@
 (def right 3)
 (def a 4)
 
+# directions
+(def +right+ 0)
+(def +left+ 1)
+
 # a lil vector type with helpers, mostly stolen from
 # https://github.com/AlecTroemel/junk-drawer
 
@@ -69,8 +73,8 @@
     (fn [self other]
       (math/sqrt (:distance-squared self other)))
     :zero-if-smol
-    (fn [self component smol]
-      (when (< (math/abs (self component)) smol) (set (self component) 0)))
+    (fn [self component smol-number]
+      (when (< (math/abs (self component)) smol-number) (set (self component) 0)))
     :reduce-by
     (fn [self component value]
       (set (self component) (- (self component) (* value (signum (self component))))))
@@ -88,10 +92,11 @@
   (default y 0)
   (table/setproto @{:x x :y y} vector))
 
-(defn draw-sprite-vector [sprite-id &opt position-vector scale]
+(defn draw-sprite-vector [sprite-id &opt position-vector scale direction]
   (default position-vector {:x 0 :y 0})
   (default scale 2)
-  (spr sprite-id (math/round (position-vector :x)) (math/round (position-vector :y)) 0 scale))
+  (default direction +right+)
+  (spr sprite-id (math/round (position-vector :x)) (math/round (position-vector :y)) 0 scale direction))
 
 # game handling begins here
 
@@ -99,6 +104,8 @@
               :velocity (new-vector)
               :acceleration 0
               :max-velocity 0
+              :scale 2
+              :direction +right+
               :is-dead false
               :is-on-ground false
               :update (fn [self dt]
@@ -114,7 +121,10 @@
                         (:clamp (self :velocity) :x (self :max-velocity))
                         (:add (self :position) (self :velocity)))
               :draw (fn [self]
-                      (draw-sprite-vector (self :sprite-id) (self :position)))})
+                      (draw-sprite-vector (self :sprite-id)
+                                          (self :position)
+                                          (self :scale)
+                                          (self :direction)))})
 
 # player
 (def player @{:sprite-id 256
@@ -124,11 +134,16 @@
                               (when (self :is-controllable)
                                 (if (not (or (btn left) (btn right)))
                                   (set (self :acceleration) 0)
+                                  # TODO: handle pressing left when holding right
                                   (do
                                     (when (btn left)
-                                      (set (self :acceleration) -1))
+                                      (do
+                                        (set (self :direction) +left+)
+                                        (set (self :acceleration) -1)))
                                     (when (btn right)
-                                      (set (self :acceleration) 1))))))})
+                                      (do
+                                        (set (self :direction) +right+)
+                                        (set (self :acceleration) 1)))))))})
 
 (def player (table/setproto player entity))
 
