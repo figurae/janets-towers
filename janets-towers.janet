@@ -103,35 +103,35 @@
               :is-dead false
               :is-on-ground false
               :update (fn [self dt]
-                        (do
-                          (when (not (self :is-on-ground))
-                            (:apply (self :velocity) :y gravity dt))
+                        (when (not (self :is-on-ground))
+                          (:apply (self :velocity) :y gravity dt))
 
-                          (:zero-if-smol (self :velocity) :x smol-number)
+                        (:zero-if-smol (self :velocity) :x smol-number)
 
-                          (when (not (= ((self :velocity) :x) 0))
-                            (:reduce-by (self :velocity) :x friction))
+                        (when (not (= ((self :velocity) :x) 0))
+                          (:reduce-by (self :velocity) :x friction))
 
-                          (:apply (self :velocity) :x (self :acceleration) dt)
-                          (:add (self :position) (self :velocity))
-                          (:clamp (self :velocity) :x (self :max-velocity))))
+                        (:apply (self :velocity) :x (self :acceleration) dt)
+                        (:clamp (self :velocity) :x (self :max-velocity))
+                        (:add (self :position) (self :velocity)))
               :draw (fn [self]
                       (draw-sprite-vector (self :sprite-id) (self :position)))})
 
 # player
-(def player
-  (table/setproto @{:sprite-id 256
-                    :max-velocity 2
-                    :is-controllable false
-                    :handle-input (fn [self]
-                                    (when (self :is-controllable)
-                                      (if (not (or (btn left) (btn right)))
-                                        (set (self :acceleration) 0)
-                                        (do
-                                          (when (btn left)
-                                            (set (self :acceleration) -1))
-                                          (when (btn right)
-                                            (set (self :acceleration) 1))))))} entity))
+(def player @{:sprite-id 256
+              :max-velocity 2
+              :is-controllable false
+              :handle-input (fn [self]
+                              (when (self :is-controllable)
+                                (if (not (or (btn left) (btn right)))
+                                  (set (self :acceleration) 0)
+                                  (do
+                                    (when (btn left)
+                                      (set (self :acceleration) -1))
+                                    (when (btn right)
+                                      (set (self :acceleration) 1))))))})
+
+(def player (table/setproto player entity))
 
 (defn handle-input []
   (set (player :is-controllable) true)
