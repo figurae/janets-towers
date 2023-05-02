@@ -13,8 +13,6 @@
 
 # initial values live here
 
-# constants
-
 # general
 (def smol-number 0.1) # a small number that is close enough to 0
 
