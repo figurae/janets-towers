@@ -28,8 +28,7 @@
 (def right 3)
 (def a 4)
 
-# a lil vector type with helpers,
-# mostly stolen from
+# a lil vector type with helpers, mostly stolen from
 # https://github.com/AlecTroemel/junk-drawer
 
 # pass the operator to both vector
