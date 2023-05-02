@@ -96,16 +96,6 @@
 
 # game handling begins here
 
-(def input @{:left false
-             :right false
-             :up false
-             :down false
-             :a false
-             :is-left-or-right (fn [self]
-                                 (if (or
-                                       (self :left)
-                                       (self :right)) true false))})
-
 (def entity @{:position (new-vector)
               :velocity (new-vector)
               :acceleration 0
@@ -135,19 +125,17 @@
                     :is-controllable false
                     :handle-input (fn [self]
                                     (when (self :is-controllable)
-                                      (if (:is-left-or-right input)
+                                      (if (not (or (btn left) (btn right)))
+                                        (set (self :acceleration) 0)
                                         (do
-                                          (when (input :left)
+                                          (when (btn left)
                                             (set (self :acceleration) -1))
-                                          (when (input :right)
-                                            (set (self :acceleration) 1)))
-                                        (set (self :acceleration) 0))))} entity))
-(defn handle-input []
-  # TODO: this seems redundant
-  (if (btn left) (set (input :left) true) (set (input :left) false))
-  (if (btn right) (set (input :right) true) (set (input :right) false))
+                                          (when (btn right)
+                                            (set (self :acceleration) 1))))))} entity))
 
+(defn handle-input []
   (set (player :is-controllable) true)
+
   (:handle-input player))
 
 (defn update [dt]
