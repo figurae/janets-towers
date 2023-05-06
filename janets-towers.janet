@@ -98,11 +98,41 @@
   (default direction +right+)
   (spr sprite-id (math/round (position :x)) (math/round (position :y)) 0 scale direction))
 
+# rectangle type with helpers
+
+(def rectangle
+  @{:x1
+    (fn [self]
+      ((self :position) :x))
+    :x2
+    (fn [self]
+      (+ ((self :position) :x)
+         ((self :size) :x)))
+    :y1
+    (fn [self]
+      ((self :position) :y))
+    :y2
+    (fn [self]
+      (+ ((self :position) :y)
+         ((self :size) :y)))
+    :is-intersecting
+    (fn [self other]
+      (and (< (self :x1) (other :x2))
+           (> (self :x2) (other :x1))
+           (< (self :y1) (other :y2))
+           (> (self :y2) (other :y1))))})
+
+(defn new-rectangle [&opt position size]
+  (default position {:x 0 :y 0})
+  (default size {:x 0 :y 0})
+  (table/setproto {:position position :size size} rectangle))
+
 # game handling begins here
 
 (def entity @{:position (new-vector)
               :velocity (new-vector)
               :acceleration 0
+              :bounding-box (new-rectangle)
               :max-velocity 0
               :scale 2
               :direction +right+
@@ -211,3 +241,4 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
+
