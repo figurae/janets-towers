@@ -125,7 +125,7 @@
 (defn new-rectangle [&opt position size]
   (default position {:x 0 :y 0})
   (default size {:x 0 :y 0})
-  (table/setproto {:position position :size size} rectangle))
+  (table/setproto @{:position position :size size} rectangle))
 
 # game handling begins here
 
