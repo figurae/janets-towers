@@ -92,7 +92,7 @@
   (default y 0)
   (table/setproto @{:x x :y y} vector))
 
-(defn draw-sprite-vector [sprite-id &opt position scale direction]
+(defn draw-sprite [sprite-id &opt position scale direction]
   (default position {:x 0 :y 0})
   (default scale 2)
   (default direction +right+)
@@ -151,10 +151,10 @@
                         (:clamp (self :velocity) :x (self :max-velocity))
                         (:add (self :position) (self :velocity)))
               :draw (fn [self]
-                      (draw-sprite-vector (self :sprite-id)
-                                          (self :position)
-                                          (self :scale)
-                                          (self :direction)))})
+                      (draw-sprite (self :sprite-id)
+                                   (self :position)
+                                   (self :scale)
+                                   (self :direction)))})
 
 # player
 (def player @{:sprite-id 256
