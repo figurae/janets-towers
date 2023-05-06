@@ -138,7 +138,15 @@
               :direction +right+
               :is-dead false
               :is-on-ground false
+              :stop-falling-at (fn [self height]
+                                 (when (> ((self :position) :y) height)
+                                   (do
+                                     (set (self :is-on-ground) true)
+                                     (set ((self :velocity) :y) 0)
+                                     (set ((self :position) :y) (- height (((self :bounding-box) :size) :y))))))
               :update (fn [self dt]
+                        (:stop-falling-at self 50)
+
                         (when (not (self :is-on-ground))
                           (:apply (self :velocity) :y gravity dt))
 
@@ -183,7 +191,7 @@
   (:handle-input player))
 
 (defn update [dt]
-  (set (player :is-on-ground) true)
+  # (set (player :is-on-ground) true)
 
   (:update player dt))
 
