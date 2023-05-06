@@ -92,11 +92,11 @@
   (default y 0)
   (table/setproto @{:x x :y y} vector))
 
-(defn draw-sprite-vector [sprite-id &opt position-vector scale direction]
-  (default position-vector {:x 0 :y 0})
+(defn draw-sprite-vector [sprite-id &opt position scale direction]
+  (default position {:x 0 :y 0})
   (default scale 2)
   (default direction +right+)
-  (spr sprite-id (math/round (position-vector :x)) (math/round (position-vector :y)) 0 scale direction))
+  (spr sprite-id (math/round (position :x)) (math/round (position :y)) 0 scale direction))
 
 # game handling begins here
 
@@ -211,4 +211,3 @@
 # <PALETTE>
 # 000:1a1c2c5d275db13e53ef7d57ffcd75a7f07038b76425717929366f3b5dc941a6f673eff7f4f4f494b0c2566c86333c57
 # </PALETTE>
-
